@@ -111,6 +111,7 @@ knowledge_base = {
     "how many players in cricket team": "There are 11 players in a cricket team.",
     "national sport of india": "The national sport of India is Hockey.",
     "which is the tallest building in the world": "Burj Khalifa is the tallest building in the world.",
+    "what is the fastest family sedan in the world": "BMW M5 CS  is the fastest family sedan on Earth"
 
     # Physics Questions
     "what is newton's first law": "An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.",
@@ -217,12 +218,14 @@ def run_jarvis():
             elif "open bluetooth" in command or "bluetooth settings" in command:
                 os.system("start ms-settings:bluetooth")
                 speak("Opening Bluetooth settings.")
+            elif "open whatsapp" in command:
+                webbrowser.open("https://web.whatsapp.com")
 
             elif "remember" in command:
                 speak("What should I remember?")
                 memory = listen_command()
                 save_memory(memory)
-                speak("Got it. I’ll remember that.")
+                speak("Got it. IÂ’ll remember that.")
             elif "do you remember" in command:
                 memory = recall_memory()
                 speak(f"You told me to remember: {memory}")
