@@ -9,9 +9,13 @@ import os
 import time
 import requests
 
+NEWS_API_KEY = "81f8bf38f875426386915079940d6971"
+AI_API_KEY = "you api key here"
+AI_API_URL = "the url"
+AI_MODEL = "model"
+
 def get_news():
-    api_key = "81f8bf38f875426386915079940d6971"
-    url = f"https://newsapi.org/v2/top-headlines?country=in&apiKey={api_key}"
+    url = f"https://newsapi.org/v2/top-headlines?country=in&apiKey={NEWS_API_KEY}"
     try:
         response = requests.get(url)
         data = response.json()
@@ -24,7 +28,32 @@ def get_news():
     except Exception as e:
         return [f"Error fetching news: {e}"]
 
-
+def ask_ai(prompt):
+    if not AI_API_KEY:
+        return "I don't have an AI key set up yet."
+    headers = {
+        "Authorization": f"Bearer {AI_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://localhost",
+        "X-Title": "Jarvis"
+    }
+    payload = {
+        "model": AI_MODEL,
+        "messages": [
+            {"role": "system", "content": "You are Jarvis, a concise voice assistant. Keep answers short."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+    try:
+        response = requests.post(AI_API_URL, headers=headers, json=payload, timeout=15)
+        data = response.json()
+        if "choices" in data:
+            return data["choices"][0]["message"]["content"].strip()
+        if "error" in data:
+            return f"AI service error: {data['error'].get('message', data['error'])}"
+        return f"Unexpected AI response: {data}"
+    except Exception as e:
+        return f"I couldn't reach the AI service. {e}"
 
 # Text-to-speech setup
 engine = pyttsx3.init()
@@ -80,7 +109,6 @@ def listen_command():
 
 # Knowledge base for GK and Physics
 knowledge_base = {
-    # GK Questions
     "what is the smallest continent": "The smallest continent is Australia.",
     "who is the prime minister of india": "The Prime Minister of India is Narendra Modi.",
     "capital of france": "The capital of France is Paris.",
@@ -111,9 +139,7 @@ knowledge_base = {
     "how many players in cricket team": "There are 11 players in a cricket team.",
     "national sport of india": "The national sport of India is Hockey.",
     "which is the tallest building in the world": "Burj Khalifa is the tallest building in the world.",
-    "what is the fastest family sedan in the world": "BMW M5 CS  is the fastest family sedan on Earth"
-
-    # Physics Questions
+    "what is the fastest family sedan in the world": "BMW M5 CS  is the fastest family sedan on Earth",
     "what is newton's first law": "An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.",
     "what is newton's second law": "Force equals mass times acceleration.",
     "what is newton's third law": "For every action, there is an equal and opposite reaction.",
@@ -167,7 +193,6 @@ def run_jarvis():
         if "jarvis" not in command:
             continue
 
-        # Wake word detected
         speak("Yes? What can I do for you?")
 
         while True:
@@ -201,10 +226,9 @@ def run_jarvis():
                 speak("Here are the top headlines.")
                 headlines = get_news()
                 for headline in headlines:
-                    print("Headline:", headline)  # Debug print
+                    print("Headline:", headline)
                     speak(headline)
                 continue
-
             elif "open spotify" in command:
                 webbrowser.open("https://open.spotify.com")
             elif "open facebook" in command:
@@ -220,12 +244,11 @@ def run_jarvis():
                 speak("Opening Bluetooth settings.")
             elif "open whatsapp" in command:
                 webbrowser.open("https://web.whatsapp.com")
-
             elif "remember" in command:
                 speak("What should I remember?")
                 memory = listen_command()
                 save_memory(memory)
-                speak("Got it. Ill remember that.")
+                speak("Got it. Ill remember that.")
             elif "do you remember" in command:
                 memory = recall_memory()
                 speak(f"You told me to remember: {memory}")
@@ -242,7 +265,6 @@ def run_jarvis():
                 speak("Goodbye!")
                 return
             elif command != "":
-                speak("Sorry, I didn't understand that.")
+                speak(ask_ai(command))
 
-# Start the assistant
 run_jarvis()
