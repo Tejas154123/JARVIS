@@ -35,9 +35,13 @@ Welcome to the **Jarvis** project — a fully customizable, offline-friendly voi
 ---
 
 ## 🧩 Requirements
+Use this URL if you are using openrouter api key:
+https://openrouter.ai/api/v1/chat/completions
+
+Suggested AI model: "openai/gpt-4o-mini"
+
 
 Install all the required libraries using:
-
 ```bash
 pip install pyttsx3
 pip install speechrecognition
